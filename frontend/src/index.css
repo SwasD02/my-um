@@ -1,13 +1,27 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Text&display=swap');
+
+:root {
+  --primary-blue: #012f6b;
+  --accent-yellow: #f3aa1d;
+  --highlight-blue: #1ba3dc;
+  --text-brown: #512d1f;
+
+  --font-main: 'DM Serif Text', serif;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+html {
+  height : 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: var(--font-main);
+  background-image: linear-gradient(to right top, #012f6b, #004a89, #0067a5, #0284c1, #1ba3dc);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
 }
