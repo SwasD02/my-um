@@ -57,6 +57,7 @@ const Navbar = () => {
         </div>
       </div>
 
+
       <div className="navbar-right">
         <button 
           className={`theme-toggle ${isDarkMode ? 'dark' : 'light'}`}

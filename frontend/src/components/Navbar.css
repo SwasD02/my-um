@@ -26,7 +26,7 @@
   gap: 24px;
 }
 
-.time-div {
+.time-div{
   display: flex;
   align-items: center;
   font-family: var(--font-main);
@@ -53,23 +53,23 @@
   opacity: 0.8;
 }
 
-.temp-div {
+.temp-div{
   display: flex;
   align-items: center;
   font-family: var(--font-main);
 }
 
-.temp-content {
+.temp-content{
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
 }
 
-.temp-icon {
+.temp-icon{
   font-size: 18px;
 }
 
-.temp-info {
+.temp-info{
   display: flex;
   align-items: center;
   gap: 12px;

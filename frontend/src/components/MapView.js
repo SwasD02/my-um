@@ -23,11 +23,24 @@ function MapResizer() {
   return null;
 }
 
+const custIcon = L.divIcon({
+        className: "custom-svg-icon", 
+        html: `
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-map-pin">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"></path>
+        <circle cx="12" cy="9" r="3"></circle>
+        </svg>
+        `, 
+        iconSize: [40, 40], 
+        iconAnchor: [20, 40], 
+        popupAnchor: [0, -40], 
+});
+
 function MapActions() {
   const map = useMap();
 
   const panToNewLocation = () => {
-    map.panTo([49.8954, -97.1385]);
+    map.flyTo([49.8954, -97.1385]);
   };
 
   const zoomIn = () => {
@@ -40,25 +53,13 @@ function MapActions() {
 
   useMapEvents({
     click(e) {
-      const customIcon = new L.Icon({
-        iconUrl:
-          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-        iconRetinaUrl:
-          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-        shadowUrl:
-          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41],
-      });
 
-      L.marker(e.latlng, { icon: customIcon })
+      /*L.marker(e.latlng, { icon: custIcon })
         .addTo(map)
         .bindPopup(
           `Clicked at: ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`
         )
-        .openPopup();
+        .openPopup();*/
     },
     zoomend() {
       console.log("Map zoom ended:", map.getZoom());
@@ -86,8 +87,44 @@ function MapActions() {
   );
 }
 
+
+/*const CurrLocation = () => {
+
+    const map = useMap();
+
+    useEffect(() => {
+        if (!navigator.geolocation) {
+            console.log('Geolocation is not supported by your browser');
+            alert('Geolocation is not supported by your browser. Cannot get current location.');
+        return;
+        }
+
+        const onSuccess = (pos) => {
+            const { latitude, longitude } = pos.coords;
+            map.flyTo([latitude, longitude], map.getZoom());
+
+            L.marker([latitude, longitude], { icon: custIcon }) 
+            .addTo(map)
+            .bindPopup('You are here!')
+            .openPopup();
+        }
+
+        const onError = (error) => {
+            console.log("Error fetching location!" + {error});
+            alert('Error getting location: ' + error.message);
+        }
+
+        navigator.geolocation.getCurrentPosition(onSuccess, onError, {
+           enableHighAccuracy: true,
+           timeout: 10000,
+           maximumAge: 0,
+        });
+    
+    }, [map]);
+}*/ 
+
 const MapView = () => {
-  const initialPosition = [49.8054, -97.1401];
+  const initialPosition = [49.8083, -97.1343];
 
   return (
     <MapContainer
@@ -100,9 +137,10 @@ const MapView = () => {
         attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
       />
-      <Marker position={initialPosition}>
+      <Marker position={initialPosition} icon={custIcon}>
         <Popup>Initial Location</Popup>
       </Marker>
+      {/*<CurrLocation/>*/}
       <MapActions />
       <MapResizer />
     </MapContainer>
