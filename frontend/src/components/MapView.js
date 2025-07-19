@@ -1,8 +1,12 @@
-import {MapContainer,TileLayer,Marker,Popup,useMap,useMapEvents,} from "react-leaflet";
+import {MapContainer,TileLayer,Marker,Polyline,Popup,useMap,useMapEvents,} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "./MapView.css";
-import { useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+
+import TripContext from "../context/TripContext";
+
+const api_ORS = process.env.REACT_APP_OPEN_ROUTE_API_KEY;
 
 function MapResizer() {
   const map = useMap();
@@ -87,8 +91,76 @@ function MapActions() {
   );
 }
 
-const OpenRouteServicePolyline = ({startcoords, endcoords, API_KEY}) => {
+const OpenRouteServicePolyline = ({startCoords, endCoords, api_key}) => {
+    const [route, setRoute] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const map = useMap();
 
+    useEffect(() => {
+    const fetchRoute = async () => {
+      setLoading(true);
+      setError(null);
+      setRoute(null); 
+
+      if (!api_key || !startCoords || !endCoords) {
+        setError("API Key or coordinates are missing.");
+        setLoading(false);
+        return;
+      }
+
+      const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${api_key}&start=${startCoords[1]},${startCoords[0]}&end=${endCoords[1]},${endCoords[0]}`;
+
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json, application/geo+json, application/gpx+xml, application/zipped-pbf',
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.error.message || 'Unknown error'}`);
+        }
+
+        const data = await response.json();
+
+        if (data.features && data.features.length > 0) {
+          const decodedPolyline = data.features[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+          setRoute(decodedPolyline);
+
+          if (decodedPolyline.length > 0) {
+            const bounds = L.latLngBounds(decodedPolyline);
+            map.fitBounds(bounds, { padding: [50, 50] }); 
+          }
+
+        } else {
+          setError("No route found for the given coordinates.");
+        }
+      } catch (e) {
+        console.error("Error fetching route:", e);
+        setError(`Failed to fetch route: ${e.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRoute();
+  }, [startCoords, endCoords, api_key, map]); 
+
+  if (loading) {
+    return <div className="text-center p-4 text-blue-600">Loading route...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center p-4 text-red-600">Error: {error}</div>;
+  }
+
+  return route ? (
+    <Polyline pathOptions={{ color: 'blue', weight: 5, opacity: 0.7 }} positions={route} />
+  ) : null;
 }
 
 
@@ -128,7 +200,49 @@ const OpenRouteServicePolyline = ({startcoords, endcoords, API_KEY}) => {
 }*/ 
 
 const MapView = () => {
-  const initialPosition = [49.8083, -97.1343];
+  const {trips} = useContext(TripContext);
+  const [initialPosition, setInitialPosition] = useState(null);
+  const [finalPosition, setFinalPosition] = useState(null);
+
+  useEffect(() => {
+    setInitialPosition([49.8083, -97.1343]);
+    setFinalPosition([49.887379, -97.131187]);
+  },[]);
+
+  
+  //This makes sure all the polylines are in an array and then rendered all at once [DOESN'T THROW too many renders]
+  const allTripsPolyline = [];
+  let currStart = initialPosition;
+
+  if(initialPosition && trips.length > 0){
+    trips.forEach((eachTrip, index) => {
+      const end = [eachTrip.coordLat, eachTrip.coordLong];
+
+      allTripsPolyline.push(
+        <div>
+        <OpenRouteServicePolyline
+          key = {eachTrip.id || index}
+          startCoords={currStart}
+          endCoords={end}
+          api_key={api_ORS}
+        />
+        <Marker position={end} icon={custIcon}> 
+          <Popup>{eachTrip.title}{eachTrip.address}</Popup>
+        </Marker>
+        </div>
+      );
+
+      currStart = end;
+    })
+  }
+
+  if(!initialPosition || !finalPosition){
+    return(
+      <div>
+        LOADING...
+      </div>
+    )
+  }
 
   return (
     <MapContainer
@@ -145,6 +259,15 @@ const MapView = () => {
         <Popup>Initial Location</Popup>
       </Marker>
       {/*<CurrLocation/>*/}
+
+      {/*<OpenRouteServicePolyline
+        startCoords={initialPosition}
+        endCoords={finalPosition}
+        api_key={api_ORS}
+        />*/}
+
+      {allTripsPolyline}
+
       <MapActions />
       <MapResizer />
     </MapContainer>

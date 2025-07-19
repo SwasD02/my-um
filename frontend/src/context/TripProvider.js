@@ -9,37 +9,32 @@ const TripProvider = ({children}) => {
 
         const listTrip = [
           {
-            id: "1",
+            id: "0",
             title: "Class at Uni",
             address: "University of Manitoba",
             startTime: "10:00",
             endTime: "11:30",
-            /*coords: {
-              lat: 43.65107,
-              lng: -79.347015,
-            }*/
+            coordLat: "49.8054",
+            coordLong: "-97.1401",
           },
           {
-            id: "2",
+            id: "1",
             title: "go to gym",
             address: "Planet Fitness, Pembina Highway",
             startTime: "9:00",
             endTime: "9:45",
-            /*coords: {
-              lat: 43.65107,
-              lng: -79.347015,
-            }*/
+            coordLat: "49.7977",
+            coordLong: "-97.1482",
+            
           },
           {
-            id: "3",
+            id: "2",
             title: "work",
             address: "Manitoba Legislative Assembly",
             startTime: "12:00",
             endTime: "13:00",
-            /*coords: {
-              lat: 43.65107,
-              lng: -79.347015,
-            }*/
+            coordLat: "49.88502",
+            coordLong: "-97.14708",
           }
         ];
 
@@ -49,7 +44,7 @@ const TripProvider = ({children}) => {
     }, []);
 
     const addTrip = (newTrip) => {
-       const ind = dataArray.length + 1;
+       const ind = dataArray.length;
        setTrips((prevTrips) => [...prevTrips, {...newTrip, ind}]);
        console.log("new trip added ", {...newTrip, ind});
     }
