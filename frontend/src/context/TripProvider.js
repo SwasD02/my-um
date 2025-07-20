@@ -10,7 +10,7 @@ const TripProvider = ({children}) => {
         const listTrip = [
           {
             id: "0",
-            title: "Class at Uni",
+            title: "Class: COMP XYZA",
             address: "University of Manitoba",
             startTime: "10:00",
             endTime: "11:30",
@@ -19,7 +19,7 @@ const TripProvider = ({children}) => {
           },
           {
             id: "1",
-            title: "go to gym",
+            title: "Go to gym",
             address: "Planet Fitness, Pembina Highway",
             startTime: "9:00",
             endTime: "9:45",
@@ -29,7 +29,7 @@ const TripProvider = ({children}) => {
           },
           {
             id: "2",
-            title: "work",
+            title: "Work",
             address: "Manitoba Legislative Assembly",
             startTime: "12:00",
             endTime: "13:00",

@@ -1,6 +1,7 @@
 import {useContext} from 'react'
 import TripContext from "../context/TripContext";
 import {useState, useRef} from 'react';
+import './TripList.css'
 
 const LOCATIONIQ_TOKEN = process.env.REACT_APP_LOCATION_IQ_KEY;
 
@@ -8,6 +9,9 @@ const LOCATIONIQ_TOKEN = process.env.REACT_APP_LOCATION_IQ_KEY;
 const TripList = () => {
 
     const {trips, addTrip, deleteTrip} = useContext(TripContext);
+
+    // eslint-disable-next-line
+    const [currentTime, setCurrentTime] = useState(new Date());
 
     const [tripTitle, setTripTitle] = useState('');
     const [tripStartTime, setTripStartTime] = useState("00:00");
@@ -73,12 +77,13 @@ const TripList = () => {
         });
     };
 
-
-    if(trips.length === 0){
-        return(
-            <p>No events found!</p>
-        )
-    }
+    const formatDate = (date) => {
+        return date.toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric'
+        });
+    };
 
     const addTripSubmit = (e) => {
         e.preventDefault();
@@ -107,54 +112,89 @@ const TripList = () => {
     }
 
     return (
-        <div>
-            <h1>List of events:</h1>
-            {trips.length === 0 ? "No events found." : "The events for the day are: "}
-            <ul>
-                {trips.map((trip) => (
-                    <li key={trip.id}>
-                        <strong>{trip.title}</strong> at {trip.address}, from {trip.startTime} till {trip.endTime} with lat : {trip.coordLat} and long: {trip.coordLong}
-                        <button onClick={() => deleteTrip(trip.id)}>
-                            DEL
-                        </button>
-                    </li> 
-                )
-                )}
-            </ul>
-            
+      <div className="container">
+        <h1 className="heading">{formatDate(currentTime)}</h1>
+        <p className="status-message">
+          {trips.length === 0
+            ? "No events found."
+            : "The events for the day are:"}
+        </p>
 
-            <h2> ADD AN EVENT: </h2>
-            <form onSubmit={addTripSubmit}>
-                <div>
-                    <label>Title:</label>
-                    <input type="text" value={tripTitle} placeholder="Class : COMP 1010" onChange= {(e) => setTripTitle(e.target.value)}/>
+        <ul className="trip-list">
+          {trips.map((trip) => (
+            <li key={trip.id} className="trip-item">
+              <div className="trip-info">
+                <div className="trip-title">{trip.title}</div>
+                <div className="trip-meta">
+                  {trip.address}
+                  <br />
+                  {trip.startTime} - {trip.endTime}
                 </div>
-                <div>
-                    <label>Start Time:</label>
-                    <input type="time" value={tripStartTime} onChange= {(e) => setTripStartTime(e.target.value)}/>
-                </div>
-                <div>
-                    <label>End time:</label>
-                    <input type="time" value={tripEndTime} onChange= {(e) => setTripEndTime(e.target.value)}/>
-                </div>
-                <div>
-                    <label>Location:</label>
-                    <input type="text" value={location} placeholder="Type the location..." onChange= {handleLocation}/>
-                    {suggestions.length > 0 && (
-                        <ul>
-                            {suggestions.map((place) => {
-                                return(
-                                    <li key = {place.place_id}
-                                    onClick={() => selectLocation(place)}>{place.display_name}</li>
-                                );
-                            })}
-                        </ul>
-                    )}
-                </div>
-                <button type="submit">ADD</button>
-            </form>
-        </div>
-    )
+              </div>
+              <button
+                className="delete-btn"
+                onClick={() => deleteTrip(trip.id)}
+              >
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        <h2 className="subheading">Add an Event</h2>
+        <form className="trip-form" onSubmit={addTripSubmit}>
+          <div className="form-group">
+            <label>Title:</label>
+            <input
+              type="text"
+              value={tripTitle}
+              placeholder="e.g., COMP 1010 Lecture"
+              onChange={(e) => setTripTitle(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label>Start Time:</label>
+            <input
+              type="time"
+              value={tripStartTime}
+              onChange={(e) => setTripStartTime(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label>End Time:</label>
+            <input
+              type="time"
+              value={tripEndTime}
+              onChange={(e) => setTripEndTime(e.target.value)}
+            />
+          </div>
+          <div className="form-group location-group">
+            <label>Location:</label>
+            <input
+              type="text"
+              value={location}
+              placeholder="Type the location..."
+              onChange={handleLocation}
+            />
+            {suggestions.length > 0 && (
+              <ul className="suggestions-box">
+                {suggestions.map((place) => (
+                  <li
+                    key={place.place_id}
+                    onClick={() => selectLocation(place)}
+                  >
+                    {place.display_name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <button className="add-btn" type="submit">
+            Add
+          </button>
+        </form>
+      </div>
+    );
 
 }
 

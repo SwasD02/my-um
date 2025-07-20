@@ -30,13 +30,12 @@ function MapResizer() {
 const custIcon = L.divIcon({
         className: "custom-svg-icon", 
         html: `
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-map-pin">
-        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"></path>
-        <circle cx="12" cy="9" r="3"></circle>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 85" fill="#e4001eff">
+        <path stroke-width="4" d="M 5,33.103579 C 5,17.607779 18.457,5 35,5 C 51.543,5 65,17.607779 65,33.103579 C 65,56.388679 40.4668,76.048179 36.6112,79.137779 C 36.3714,79.329879 36.2116,79.457979 36.1427,79.518879 C 35.8203,79.800879 35.4102,79.942779 35,79.942779 C 34.5899,79.942779 34.1797,79.800879 33.8575,79.518879 C 33.7886,79.457979 33.6289,79.330079 33.3893,79.138079 C 29.5346,76.049279 5,56.389379 5,33.103579 Z M 35.0001,49.386379 C 43.1917,49.386379 49.8323,42.646079 49.8323,34.331379 C 49.8323,26.016779 43.1917,19.276479 35.0001,19.276479 C 26.8085,19.276479 20.1679,26.016779 20.1679,34.331379 C 20.1679,42.646079 26.8085,49.386379 35.0001,49.386379 Z"></path>
         </svg>
         `, 
-        iconSize: [40, 40], 
-        iconAnchor: [20, 40], 
+        iconSize: [20, 20], 
+        iconAnchor: [10, 20], 
         popupAnchor: [0, -40], 
 });
 
@@ -91,7 +90,7 @@ function MapActions() {
   );
 }
 
-const OpenRouteServicePolyline = ({startCoords, endCoords, api_key}) => {
+const OpenRouteServicePolyline = ({startCoords, endCoords, api_key, color}) => {
     const [route, setRoute] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -159,7 +158,7 @@ const OpenRouteServicePolyline = ({startCoords, endCoords, api_key}) => {
   }
 
   return route ? (
-    <Polyline pathOptions={{ color: 'blue', weight: 5, opacity: 0.7 }} positions={route} />
+    <Polyline pathOptions={{ color: color || 'blue', weight: 5, opacity: 0.7 }} positions={route} />
   ) : null;
 }
 
@@ -205,9 +204,9 @@ const MapView = () => {
   const [finalPosition, setFinalPosition] = useState(null);
 
   useEffect(() => {
-    setInitialPosition([49.8083, -97.1343]);
+    (trips[0] != null) ? setInitialPosition([trips[0].coordLat, trips[0].coordLong]) : setInitialPosition(null);
     setFinalPosition([49.887379, -97.131187]);
-  },[]);
+  },[trips]);
 
   
   //This makes sure all the polylines are in an array and then rendered all at once [DOESN'T THROW too many renders]
@@ -218,6 +217,9 @@ const MapView = () => {
     trips.forEach((eachTrip, index) => {
       const end = [eachTrip.coordLat, eachTrip.coordLong];
 
+      const hue = 0 + ((240 - 0) * index) / (trips.length - 1); 
+      const color = `hsl(${hue}, 100%, 35%)`;
+
       allTripsPolyline.push(
         <div>
         <OpenRouteServicePolyline
@@ -225,23 +227,18 @@ const MapView = () => {
           startCoords={currStart}
           endCoords={end}
           api_key={api_ORS}
+          color={color}
         />
         <Marker position={end} icon={custIcon}> 
-          <Popup>{eachTrip.title}{eachTrip.address}</Popup>
+          <Popup>
+            {eachTrip.title}<br/>{eachTrip.address}
+            </Popup>
         </Marker>
         </div>
       );
 
       currStart = end;
     })
-  }
-
-  if(!initialPosition || !finalPosition){
-    return(
-      <div>
-        LOADING...
-      </div>
-    )
   }
 
   return (
@@ -255,18 +252,16 @@ const MapView = () => {
         attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
       />
-      <Marker position={initialPosition} icon={custIcon}>
-        <Popup>Initial Location</Popup>
-      </Marker>
-      {/*<CurrLocation/>*/}
 
-      {/*<OpenRouteServicePolyline
-        startCoords={initialPosition}
-        endCoords={finalPosition}
-        api_key={api_ORS}
-        />*/}
+      {(initialPosition && finalPosition) &&
+        <div>
+          <Marker position={initialPosition} icon={custIcon}>
+            <Popup>Initial Location</Popup>
+          </Marker>
 
-      {allTripsPolyline}
+          {allTripsPolyline}
+        </div>
+      }
 
       <MapActions />
       <MapResizer />

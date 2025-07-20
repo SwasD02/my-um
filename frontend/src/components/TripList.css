@@ -1,0 +1,156 @@
+
+.container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    font-family: var(--font-main);
+}
+
+.heading, .subheading {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.status-message {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #666;
+}
+
+/* Trip List */
+.trip-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 2rem;
+}
+
+.trip-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f5f7fa;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid #e0e0e0;
+    transition: background 0.2s;
+}
+
+.trip-item:hover {
+    background: #eef1f5;
+}
+
+.trip-info {
+    flex: 1;
+}
+
+.trip-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 0.4rem;
+}
+
+.trip-meta {
+    font-size: 0.95rem;
+    color: #555;
+}
+
+/* Delete Button */
+.delete-btn {
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-left: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.delete-btn:hover {
+    background-color: #d9363e;
+}
+
+/* Form */
+.trip-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+    color: #444;
+}
+
+.form-group input {
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border 0.2s;
+}
+
+.form-group input:focus {
+    border-color: #1890ff;
+    outline: none;
+}
+
+/* Suggestion Box */
+.location-group {
+    position: relative;
+}
+
+.suggestions-box {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 4px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+
+.suggestions-box li {
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.suggestions-box li:hover {
+    background-color: #f0f0f0;
+}
+
+
+.add-btn {
+    align-self: center;
+    background-color: #1890ff;
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.add-btn:hover {
+    background-color: #1677c5;
+}
