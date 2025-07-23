@@ -1,5 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Text&display=swap');
+
+/*@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Text&display=swap');
 
 :root {
   --primary-blue: #012f6b;
@@ -25,3 +29,4 @@ body {
   background-attachment: fixed;
   background-position: center;
 }
+*/
