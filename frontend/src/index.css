@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* In your global CSS file (e.g., index.css) */
+.text {
+  animation: slideIn 1s ease-out forwards;
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px); /* Starts slightly below */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0); /* Ends at the original position */
+  }
+}
+
+
 
 /*@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Text&display=swap');
 
