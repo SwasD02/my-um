@@ -203,7 +203,7 @@ const RouteScrollbar = () => {
                         {['Visual', 'Intuitive', 'Smart'].map((feature) => (
                           <div 
                             key={feature}
-                            className=" backdrop-blur-sm rounded-2xl p-6 text-center hover:bg-opacity-30 transition-all duration-300 transition-all hover:scale-105 hover:shadow-xl hover:shadow-blue-500/50 p-6 rounded-lg text-center hover:scale-105"
+                            className=" backdrop-blur-sm hover:bg-opacity-30  duration-300 transition-all hover:shadow-xl hover:shadow-blue-500/50 p-6 rounded-lg text-center hover:scale-105"
                             style={{backgroundColor: section.backgroundColor}}
                           >
                             <div className="flex justify-center items-center text-2xl font-bold text-slate-900 mb-2">{feature}</div>

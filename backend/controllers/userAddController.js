@@ -1,7 +1,6 @@
 const UserData = require("../models/userData");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const mongoose = require("mongoose");
 
 //JWT code
 const JWT_code = process.env.JWT_SECRET;
@@ -22,12 +21,12 @@ const createUser = async(req, res) => {
         if(!newUser) return res.status(400).json({error: "User creation failed!"});
 
         const jwtTok  = jwt.sign(
-          { userId: newUser._id, username: newUser.username },
+          { userID: newUser._id, username: newUser.username },    //This is payload
           JWT_code,
           { expiresIn: "2h" }
         );
         
-        res.status(200).json({message: "new username created!", jwtTok, userId: newUser._id});
+        res.status(201).json({message: "new username created!", jwtTok, userId: newUser._id});
 
     }catch(err){
         console.error(err);
@@ -38,15 +37,16 @@ const createUser = async(req, res) => {
 //POST (Create) new event
 const createNewEvent = async (req, res) => {
   try{
-    const {username, date, event} = req.body;
+    
+    const {date, event} = req.body;
 
-    if(!username || !date || !event) return res.status(400).json({error: "Params not found"});
+    if(!date || !event) return res.status(400).json({error: "Params not found"});
 
-    const user = await UserData.findOne({username: username});
+    const user = req.user;    //from jwt verifyAuth
     if (!user)
       return res
         .status(400)
-        .json({ error: "userName may be incorrect: USER not found" });
+        .json({ error: "USER not found" });
 
     let newEvent;
     const userDay = user.days.find((d) => d.date === date);
@@ -65,34 +65,35 @@ const createNewEvent = async (req, res) => {
 
     await user.save();
 
-    res.status(200).json(newEvent);
+    res.status(201).json(newEvent);
 
   }catch(err){
     console.log(err);
-    res.status(400).json({error: "Server error / Failed to create the event"});
+    res.status(500).json({error: "Server error / Failed to create the event"});
   }
 }
 
 //GET all events of the day for the user
 const getAllUserEvents = async (req, res) => {
   try {
-    const { username, date } = req.query; //e.g. /get-event?username=alice&date=Day%201&activityName=Yoga
-    if (!username || !date) {
-      console.log("username or date not found");
-      return res.status(400).json({ error: "No username/date found" });
+    
+    const { date } = req.query; //e.g. /get-event?username=alice&date=Day%201&activityName=Yoga
+    if (!date) {
+      console.log("date not found");
+      return res.status(400).json({ error: "date found" });
     }
-    const user = await UserData.findOne({username: username});
+    const user = req.user;
     if (!user)
       return res
         .status(400)
-        .json({ error: "userName may be incorrect: USER not found" });
+        .json({ error: "USER not found" });
 
     const userDay = user.days.find((d) => d.date === date);
     if (!userDay) return res.status(400).json({ error: "date not found" });
 
     const acts = userDay.events;
     if (acts.length === 0){
-      return res.status(400).json({error: "No events found for the day"});
+      return res.status(200).json([]);
     }
 
     return res.status(200).json(acts);
@@ -105,17 +106,19 @@ const getAllUserEvents = async (req, res) => {
 //GET a particular event of the day of the user
 const getUserEvent = async (req, res) => {
   try {
-    const { username, date, eventID } = req.body;
+    
+    const { date } = req.query;
+    const {id: eventID} = req.params;
 
-    if (!username || !date) {
-      console.log("username or date not found");
-      return res.status(400).json({ error: "No username/date found" });
+    if (!eventID || !date) {
+      console.log("date or eventID not found");
+      return res.status(404).json({ error: "No date/eventID found" });
     }
-    const user = await UserData.findOne({username: username});
+    const user = req.user;
     if (!user)
       return res
-        .status(400)
-        .json({ error: "userName may be incorrect: USER not found" });
+        .status(404)
+        .json({ error: "USER not found" });
 
     const userDay = user.days.find((d) => d.date === date);
     if (!userDay) return res.status(400).json({ error: "date not found" });
@@ -136,17 +139,17 @@ const getUserEvent = async (req, res) => {
 //DELETE an event 
 const delEvent = async (req, res) => {
   try{
-    const {username, date, eventID} = req.body;
+    const date = req.query;
+    const {id : eventID} = req.params;
 
-    const user = await UserData.findOne({username: username});
-    if(!user) return res.status(400).json({error: "User not found!"});
+    const user = req.user;
+    if(!user) return res.status(404).json({error: "User not found!"});
 
     const userDay = user.days.find((d) => d.date === date);
-    if(!userDay) return res.status(400).json({error: "Date not found"});
+    if(!userDay) return res.status(404).json({error: "Date not found"});
 
-    const index = userDay.events.findIndex((e) => e._id.toString() === eventID);
-    if(index === -1) return res.status(400).json({error: "eventID not found"})
-
+    const index = userDay.events.findIndex((e) => e._id.toString() === eventID);    //here, index is the array index {not mongodb index}
+    if(index === -1) return res.status(404).json({error: "eventID not found"});
 
     userDay.events.splice(index, 1);
     await user.save();
@@ -155,32 +158,42 @@ const delEvent = async (req, res) => {
 
   }catch(err){
     console.log(err);
-    res.status(400).json(err);
+    res.status(500).json({error: "Server error / Failed to delete event"});
   }
 }
 
 //DELETE an user
 const delUser = async(req, res) => {
   try{
-    const {username, password} = req.body;
+    
+    const {password} = req.body;
 
-    const user = await UserData.findOne({username: username});
-    if(!user) return res.status(400).json({error: "user not found!"});
+    const user = req.user;
+    if(!user) return res.status(404).json({error: "user not found!"});
 
     const decryptPass = await bcrypt.compare(password, user.password);
-    if(!decryptPass) return res.status(400).json({error: "password is incorrect!"});
+    if(!decryptPass) return res.status(404).json({error: "password is incorrect!"});
     
-    const result = await UserData.deleteOne({username: username});
+    const result = await UserData.deleteOne({_id : req.user._id});
 
     if(result.deletedCount === 0){
       return res.status(500).json({ error: "Failed to delete user." });
     }
 
-    res.status(200).json({message: "user deleted succesfully!"});
+    res.status(200).json({message: "user deleted successfully!"});
 
   }catch(err){
     console.log(err);
-    res.status(400).json(err);
+    res.status(500).json({error: "Server error / Failed to delete user"});
   }
+}
+
+module.exports = {
+  createUser,
+  createNewEvent,
+  getAllUserEvents,
+  getUserEvent,
+  delEvent,
+  delUser
 }
 

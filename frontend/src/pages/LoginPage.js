@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 // eslint-disable-next-line
 import {Route,User,Lock,ArrowRight,Eye,EyeOff,UserCheck,Sparkles} from 'lucide-react';
+import UserProfContext from '../context/UserProfContext';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -9,6 +10,8 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [focusedField, setFocusedField] = useState('');
+
+  const { userName, updateUserProf } = useContext(UserProfContext);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
@@ -19,14 +22,17 @@ const LoginPage = () => {
 
   const handleLogin = () => {
     console.log('Login:', { username, password });
+    updateUserProf(username);
     navigate('/userpage');
-    // Handle login logic here
+    
   };
 
   const handleGuestLogin = () => {
     console.log('Guest login');
+    updateUserProf();
+    console.log("userNAME: ", userName);
     navigate('/userpage');
-    // Handle guest login logic here
+    
   };
 
   return (

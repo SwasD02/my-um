@@ -3,7 +3,7 @@ import TripContext from "../context/TripContext";
 import { useState, useRef } from 'react';
 import { PinIcon } from 'lucide-react';
 
-const LOCATIONIQ_TOKEN = process.env.REACT_APP_LOCATION_IQ_KEY;
+//const LOCATIONIQ_TOKEN = process.env.REACT_APP_LOCATION_IQ_KEY;
 
 const TripList = () => {
   const { trips, addTrip, deleteTrip } = useContext(TripContext);
@@ -35,23 +35,52 @@ const TripList = () => {
       return;
     }
 
-    debounceTimer = setTimeout(async () => {
+    /*debounceTimer = setTimeout(async () => {
+
       const url = `https://api.locationiq.com/v1/autocomplete.php?key=${LOCATIONIQ_TOKEN}&q=${encodeURIComponent(value)}&limit=5`;
+
+      try {
+        
+        if(value.length % 6 === 0){
+          const res = await fetch(url);
+
+          if (!res.ok) {
+          //console.error('LocationIQ error: ' + res.status + " status text:" + res.statusText);
+            return;
+          }
+
+          const data = await res.json();
+          setSuggestions(data);
+        }
+        
+      } catch (err) {
+        //console.err("Autocomplete error: ", err);
+        setSuggestions([]);
+      }
+    }, 300);*/
+
+    debounceTimer = setTimeout(async() => {
+
+      const url = `/api/locIQ/autoSuggest?q=${encodeURIComponent(value)}`;
 
       try {
         const res = await fetch(url);
 
         if (!res.ok) {
-          console.error('LocationIQ error: ' + res.status + " status text:" + res.statusText);
-          return;
+            const errorData = await res.json();
+            console.error('Error fetching suggestions:', errorData.error || 'Unknown error');
+            setSuggestions([]); 
+            return;
         }
 
         const data = await res.json();
         setSuggestions(data);
+
       } catch (err) {
-        console.err("Autocomplete error: ", err);
+        console.error("Autocomplete client-side error:", err);
         setSuggestions([]);
       }
+
     }, 300);
   };
 
@@ -127,7 +156,7 @@ const TripList = () => {
             <button
               className=" text-white px-4 py-2 rounded-md transition duration-200"
             >
-              <PinIcon/>
+              <PinIcon className="hover:fill-white"/>
             </button>
           </li>
         ))}

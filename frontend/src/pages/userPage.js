@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 // eslint-disable-next-line
 import {Home,BarChart3,MapPin,Calendar,Settings,User,Bell,Search,Menu,X,ChevronRight,Clock,Route,Zap,Target} from 'lucide-react';
 import RoutePlan from '../components/RoutePlan';
 import TripList from '../components/TripList';
+import UserProfContext from '../context/UserProfContext';
 
 const UserPage = () => {
+  const { userName } = useContext(UserProfContext);
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -286,9 +289,9 @@ const UserPage = () => {
                   </div>
                   <div className="text-left">
                     <div className="text-white font-medium group-hover:text-orange-400 transition-colors duration-200">
-                      John Doe
+                      {userName}
                     </div>
-                    <div className="text-xs text-slate-400">Premium User</div>
+                    {/*<div className="text-xs text-slate-400">Premium User</div>*/}
                   </div>
                 </button>
 
@@ -296,10 +299,10 @@ const UserPage = () => {
                 {userMenuOpen && (
                   <div className="absolute right-0 top-full mt-2 w-64 bg-slate-800 border border-slate-700 rounded-xl shadow-xl py-2 z-50">
                     <div className="px-4 py-3 border-b border-slate-700">
-                      <div className="text-white font-medium">username</div>
-                      <div className="text-sm text-slate-400">
+                      <div className="text-white font-medium">{userName}</div>
+                      {/*<div className="text-sm text-slate-400">
                         john.doe@example.com
-                      </div>
+                      </div>*/}
                     </div>
                     <div className="py-2">
                       <button className="w-full text-left px-4 py-2 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors duration-200">
