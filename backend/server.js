@@ -1,6 +1,7 @@
 const express = require ('express');
 const mongoose = require('mongoose');
 const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
 
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
@@ -12,6 +13,8 @@ const PORT = process.env.PORT || 3005;
 
 const app = express();
 app.use(express.json());
+
+app.use(cookieParser());
 
 app.set('trust proxy', true);         //NOT MUCH IDEA, but this will take requests from the user's IP instead of our proxy frontend
 

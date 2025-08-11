@@ -2,31 +2,43 @@ import UserProfContext from "./UserProfContext";
 import {useState, useEffect} from 'react';
 
 const UserProfProvider = ({children}) => {
-    const [userName, setUserName] = useState("guest");
-
-    /*useEffect(() => { 
-        setUserName("guest");
-    },[]);*/
+    const [userName, setUserName] = useState("");
+    const [userid, setUserid] = useState("");
 
 
     const updateUserProf = (newUserName) => {
         if(newUserName){
             setUserName(newUserName);
-            console.log("userName given");
         }else{
             console.log('userName not given');
         }
-        
+    }
+
+    const updateUserID = (newUserID) => {
+        if(newUserID){
+            setUserid(newUserID);
+        }else{
+            console.log('no userID');
+        }
     }
 
     const logoutUserProf = () => {
-        setUserName("guest");
+        setUserName("");
+        setUserid("");
     }
+
+    useEffect(() => {
+        if(userName){
+            console.log("userName updated to: " + userName);
+        }
+    }, [userName]);
 
 
     const contextValue = {
         userName,
+        userid,
         updateUserProf,
+        updateUserID,
         logoutUserProf
     };
 

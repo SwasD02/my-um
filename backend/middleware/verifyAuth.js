@@ -4,13 +4,9 @@ const userData = require('../models/userData');
 const JWT_code = process.env.JWT_SECRET;
 
 const verifyAuth = async(req, res, next) => {
-    const authHeader = req.header('Authorization');
 
-    if(!authHeader) return res.status(400).json({error: "Token wrong, authorization failed"});
-
-    const token = authHeader.split(' ')[1];        //Because Authorization: 'Bearer <tok>', we only need the tok
-
-    if(!token) return res.status(400).json({error: "Token missing, auth failed"});
+    const token = req.cookies.token;
+    if(!token) res.status(401).json({error: "Authorization failed / Token not found"});
 
     try{
         const decodedJWT = jwt.verify(JWT_code, token);     //This returns an object if it verifies, the object is the payload that we sent through the jwt 

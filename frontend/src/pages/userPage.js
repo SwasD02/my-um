@@ -6,7 +6,7 @@ import TripList from '../components/TripList';
 import UserProfContext from '../context/UserProfContext';
 
 const UserPage = () => {
-  const { userName } = useContext(UserProfContext);
+  const { userName, userid } = useContext(UserProfContext);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -15,7 +15,11 @@ const UserPage = () => {
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    if(!userName || !userid) {
+      setSidebarOpen(false);
+    }
     return () => clearInterval(timer);
+    // eslint-disable-next-line
   }, []);
 
   const sidebarTabs = [
@@ -111,7 +115,7 @@ const UserPage = () => {
   return (
     <div className="min-h-screen bg-slate-950 flex">
       {/* Sidebar */}
-      <div
+      {<div
         className={`${
           sidebarOpen ? "w-80" : "w-20"
         } transition-all duration-300 ease-in-out bg-slate-900 border-r border-slate-800 flex flex-col relative`}
@@ -131,8 +135,10 @@ const UserPage = () => {
               </div>
             )}
             <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-lg hover:bg-slate-800 transition-colors duration-200 text-slate-400 hover:text-white"
+              onClick={userName && userid ? () => setSidebarOpen(!sidebarOpen) : null}
+              className={`p-2 rounded-lg hover:bg-slate-800 transition-colors duration-200 text-slate-400 hover:text-white ${
+                !userName && !userid && "cursor-not-allowed"
+              }`}
             >
               {sidebarOpen ? (
                 <X className="w-5 h-5" />
@@ -152,12 +158,12 @@ const UserPage = () => {
             return (
               <button
                 key={tab.id}
-                onClick={() => handleTabClick(tab)}
+                onClick={userName && userid ? () => handleTabClick(tab): null}
                 className={`w-full group relative overflow-hidden rounded-xl transition-all duration-300 ${
                   isActive
                     ? "bg-slate-800 shadow-lg transform scale-105"
                     : "hover:bg-slate-800/50 hover:transform hover:scale-102"
-                }`}
+                  } ${!userid && !userName && "cursor-not-allowed"}`}
               >
                 {/* Active indicator */}
                 {isActive && (
@@ -226,7 +232,7 @@ const UserPage = () => {
             {sidebarOpen && <span className="ml-4 font-medium">Settings</span>}
           </button>
         </div>
-      </div>
+      </div>}
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
@@ -273,10 +279,10 @@ const UserPage = () => {
               </div>
 
               {/* Notifications */}
-              <button className="relative p-2 rounded-lg hover:bg-slate-800 transition-colors duration-200 text-slate-400 hover:text-white">
+              {/*<button className="relative p-2 rounded-lg hover:bg-slate-800 transition-colors duration-200 text-slate-400 hover:text-white">
                 <Bell className="w-5 h-5" />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-              </button>
+              </button>*/}
 
               {/* User Profile */}
               <div className="relative">
@@ -289,7 +295,7 @@ const UserPage = () => {
                   </div>
                   <div className="text-left">
                     <div className="text-white font-medium group-hover:text-orange-400 transition-colors duration-200">
-                      {userName}
+                      {userName? userName : "Hi guest!"}
                     </div>
                     {/*<div className="text-xs text-slate-400">Premium User</div>*/}
                   </div>
@@ -325,7 +331,7 @@ const UserPage = () => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto bg-slate-950 h-[calc(100vh-64px)]">
+        {<main className="flex-1 overflow-auto bg-slate-950 h-[calc(100vh-64px)]">
           <div className="p-6">
             {/* Sample Dashboard Content */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
@@ -343,7 +349,7 @@ const UserPage = () => {
 
                 <TripList/>
           </div>
-        </main>
+        </main>}
       </div>
 
       {/* Click outside handler for user menu */}

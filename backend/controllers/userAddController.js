@@ -2,6 +2,8 @@ const UserData = require("../models/userData");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+require('dotenv').config();
+
 //JWT code
 const JWT_code = process.env.JWT_SECRET;
 const SALT = 10;
@@ -13,18 +15,24 @@ const createUser = async(req, res) => {
         if(!username || !password) return res.status(400).json({error: "username/pwd not found"});
 
         const user = await UserData.findOne({username : username});
-        if(user) return res.status(409).json({message: "Sorry, user already exists!"});
+        if(user) return res.status(409).json({error: "Sorry, user already exists!"});
 
         const hashedPwd = await bcrypt.hash(password, SALT);
 
-        const newUser = await UserData.create({username : username, password: hashedPwd});
-        if(!newUser) return res.status(400).json({error: "User creation failed!"});
+        const newUser = await UserData.create({username: username, password: hashedPwd});
 
         const jwtTok  = jwt.sign(
           { userID: newUser._id, username: newUser.username },    //This is payload
           JWT_code,
           { expiresIn: "2h" }
         );
+
+        res.cookie('token', jwtTok, {
+          httpOnly: true, 
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 7200000, 
+        });
         
         res.status(201).json({message: "new username created!", jwtTok, userId: newUser._id});
 
@@ -32,6 +40,39 @@ const createUser = async(req, res) => {
         console.error(err);
         res.status(500).json({ error: "Server error/ Failed to create USER" });
     }
+}
+
+//POST (login) am user
+const loginUser = async(req, res) => {
+  try{
+    const {username, password} = req.body;
+    if(!username || !password) return res.status(400).json({error: "username/pwd not found"});
+
+    const user = await UserData.findOne({username : username});
+    if(!user) return res.status(400).json({error: "Username not found."});
+
+    const decryptPass = await bcrypt.compare(password, user.password);
+    if(!decryptPass) return res.status(404).json({error: "Sorry, the password you entered is incorrect."});
+    
+    const jwtTok  = jwt.sign(
+          { userID: user._id, username: user.username },    //This is payload
+          JWT_code,
+          { expiresIn: "2h" }
+    );
+
+    res.cookie('token', jwtTok, {
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7200000,      //2h 
+    });
+
+    res.status(201).json({message: "user logged in!", jwtTok, userId: user._id});
+
+  }catch(err){
+    console.error(err);
+    res.status(500).json({error: "Server error/ Failed to login USER"});
+  }
 }
 
 //POST (Create) new event
@@ -190,6 +231,7 @@ const delUser = async(req, res) => {
 
 module.exports = {
   createUser,
+  loginUser,
   createNewEvent,
   getAllUserEvents,
   getUserEvent,
