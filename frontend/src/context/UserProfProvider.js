@@ -4,6 +4,7 @@ import {useState, useEffect} from 'react';
 const UserProfProvider = ({children}) => {
     const [userName, setUserName] = useState("");
     const [userid, setUserid] = useState("");
+    const [userDate, setUserDate] = useState("");
 
 
     const updateUserProf = (newUserName) => {
@@ -11,6 +12,7 @@ const UserProfProvider = ({children}) => {
             setUserName(newUserName);
         }else{
             console.log('userName not given');
+            setUserName('');
         }
     }
 
@@ -20,6 +22,15 @@ const UserProfProvider = ({children}) => {
         }else{
             console.log('no userID');
         }
+    }
+
+    const updateUserDate = (newUserDate) => {
+        if(newUserDate){
+            setUserDate(newUserDate);       
+        }
+        else{   
+            console.log('no userDate');
+        }           
     }
 
     const logoutUserProf = () => {
@@ -37,6 +48,8 @@ const UserProfProvider = ({children}) => {
     const contextValue = {
         userName,
         userid,
+        userDate,
+        updateUserDate,
         updateUserProf,
         updateUserID,
         logoutUserProf

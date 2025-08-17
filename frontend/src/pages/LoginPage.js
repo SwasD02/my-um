@@ -66,7 +66,7 @@ const LoginPage = () => {
     e.preventDefault();
 
     console.log('Signup:', {username, password, secPassword});
-    updateUserProf(username);
+    //updateUserProf(username);
 
     try{
       const resp = await fetch('/api/auth/register', {
@@ -85,11 +85,13 @@ const LoginPage = () => {
       if(resp.ok){
         console.log("Signup successful " + data.message + "//userID: " + data.userId);
         updateUserID(data.userId);
+        updateUserProf(username);
         setSigninUserErr('');
         navigate('/userpage');
       }else{
         console.log(data.error);
         setSigninUserErr(data.error);
+        updateUserProf('');
       }
 
     }catch(err){

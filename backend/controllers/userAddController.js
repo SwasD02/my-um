@@ -34,7 +34,7 @@ const createUser = async(req, res) => {
           maxAge: 7200000, 
         });
         
-        res.status(201).json({message: "new username created!", jwtTok, userId: newUser._id});
+        res.status(201).json({message: "new username created!", userId: newUser._id});
 
     }catch(err){
         console.error(err);
@@ -67,7 +67,7 @@ const loginUser = async(req, res) => {
         maxAge: 7200000,      //2h 
     });
 
-    res.status(201).json({message: "user logged in!", jwtTok, userId: user._id});
+    res.status(201).json({message: "user logged in!", userId: user._id});
 
   }catch(err){
     console.error(err);
@@ -75,13 +75,32 @@ const loginUser = async(req, res) => {
   }
 }
 
+//POST (logout) an user
+const logoutUser = async(req, res) => {
+  try{
+
+    res.cookie('token', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      expires: new Date(0), //Setting the date in the pats so that it is NOTEd as expired
+    });
+
+    res.status(200).json({ message: 'User logged out successfully' });
+
+  }catch(err){
+    console.log(err);
+    res.status(500).json({error : "Server error/ Failed to logout USER"});
+  }
+}
+
 //POST (Create) new event
 const createNewEvent = async (req, res) => {
   try{
     
-    const {date, event} = req.body;
+    const {userDate, event} = req.body;
 
-    if(!date || !event) return res.status(400).json({error: "Params not found"});
+    if(!userDate || !event) return res.status(400).json({error: "Params not found"});
 
     const user = req.user;    //from jwt verifyAuth
     if (!user)
@@ -90,18 +109,18 @@ const createNewEvent = async (req, res) => {
         .json({ error: "USER not found" });
 
     let newEvent;
-    const userDay = user.days.find((d) => d.date === date);
+    const userDay = user.days.find((d) => d.date === userDate);
     
     if(userDay){
       userDay.events.push(event);
       newEvent = userDay.events[userDay.events.length - 1];
     }else{
       const newDay = {
-        date,
+        date: userDate,
         events: [event],
       };
       user.days.push(newDay);
-      newEvent = userDay.events[0];
+      newEvent = newDay.events[0];
     }
 
     await user.save();
@@ -118,12 +137,13 @@ const createNewEvent = async (req, res) => {
 const getAllUserEvents = async (req, res) => {
   try {
     
-    const { date } = req.query; //e.g. /get-event?username=alice&date=Day%201&activityName=Yoga
+    const { date } = req.query; //e.g. /get-event?userID=alice&date=Day%201&activityName=Yoga
     if (!date) {
       console.log("date not found");
       return res.status(400).json({ error: "date found" });
     }
-    const user = req.user;
+    
+    const user = await req.user;    //from jwt verifyAuth
     if (!user)
       return res
         .status(400)
@@ -180,8 +200,8 @@ const getUserEvent = async (req, res) => {
 //DELETE an event 
 const delEvent = async (req, res) => {
   try{
-    const date = req.query;
-    const {id : eventID} = req.params;
+    const { id : eventID } = req.params;
+    const { date } = req.query;
 
     const user = req.user;
     if(!user) return res.status(404).json({error: "User not found!"});
@@ -232,6 +252,7 @@ const delUser = async(req, res) => {
 module.exports = {
   createUser,
   loginUser,
+  logoutUser,
   createNewEvent,
   getAllUserEvents,
   getUserEvent,

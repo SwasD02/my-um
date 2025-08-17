@@ -2,6 +2,7 @@ const express = require ('express');
 const mongoose = require('mongoose');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
@@ -15,6 +16,11 @@ const app = express();
 app.use(express.json());
 
 app.use(cookieParser());
+
+app.use(cors({
+  origin: 'http://localhost:3008', 
+  credentials: true // Crucial for allowing cookies to be sent/received across origins
+}));
 
 app.set('trust proxy', true);         //NOT MUCH IDEA, but this will take requests from the user's IP instead of our proxy frontend
 
@@ -38,7 +44,7 @@ const globalLimiter = rateLimit({
     }
 });
 
-app.use(globalLimiter);   //next() is internally called in globalLimiter
+//app.use(globalLimiter);   //next() is internally called in globalLimiter //UNCOMMENT DURING PROD
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', verifyAuth, userRoutes);

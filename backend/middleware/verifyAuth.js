@@ -9,7 +9,7 @@ const verifyAuth = async(req, res, next) => {
     if(!token) res.status(401).json({error: "Authorization failed / Token not found"});
 
     try{
-        const decodedJWT = jwt.verify(JWT_code, token);     //This returns an object if it verifies, the object is the payload that we sent through the jwt 
+        const decodedJWT = jwt.verify(token, JWT_code);     //This returns an object if it verifies, the object is the payload that we sent through the jwt 
 
         const user = await userData.findById(decodedJWT.userID).select('-password');        //.userID from payload of jwt
 

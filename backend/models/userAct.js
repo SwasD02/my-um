@@ -16,12 +16,20 @@ const eventsSchema = new Schema({
         required: true
     },
     startTime:{
-        type: Date,
+        type: String,
         required: true
     },
     endTime:{
-        type: Date,
+        type: String,
         required: true
+    },
+    coordLat : {
+        type: Number,
+        required: false
+    },
+    coordLong : {
+        type: Number,
+        required: false
     },
     notes: {
         type: String, 

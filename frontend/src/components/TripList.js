@@ -1,17 +1,21 @@
 import { useContext } from 'react';
 import TripContext from "../context/TripContext";
-import { useState, useRef } from 'react';
-import { PinIcon } from 'lucide-react';
+import UserProfContext from '../context/UserProfContext';
+import { useState, useEffect, useRef } from 'react';
+import { CircleCheck } from 'lucide-react';
 
 //const LOCATIONIQ_TOKEN = process.env.REACT_APP_LOCATION_IQ_KEY;
 
 const TripList = () => {
   const { trips, addTrip, deleteTrip } = useContext(TripContext);
+  const { userDate , updateUserDate } = useContext(UserProfContext);
 
   // eslint-disable-next-line 
   const [currentTime, setCurrentTime] = useState(new Date());
 
   const [tripTitle, setTripTitle] = useState('');
+  const [tripCateg, setTripCateg] = useState('');
+  const [tripNote, setTripNote] = useState('');
   const [tripStartTime, setTripStartTime] = useState("00:00");
   const [tripEndTime, setTripEndTime] = useState("00:00");
   const [location, setLocation] = useState('');
@@ -19,6 +23,10 @@ const TripList = () => {
 
   let debounceTimer = useRef(null);
   const [suggestions, setSuggestions] = useState([]);
+
+  useEffect(() => {
+    updateUserDate(formatDate(currentTime));
+  }, []);
 
   const handleLocation = async (e) => {
     clearTimeout(debounceTimer);
@@ -34,30 +42,6 @@ const TripList = () => {
     if (value.length < 3) {
       return;
     }
-
-    /*debounceTimer = setTimeout(async () => {
-
-      const url = `https://api.locationiq.com/v1/autocomplete.php?key=${LOCATIONIQ_TOKEN}&q=${encodeURIComponent(value)}&limit=5`;
-
-      try {
-        
-        if(value.length % 6 === 0){
-          const res = await fetch(url);
-
-          if (!res.ok) {
-          //console.error('LocationIQ error: ' + res.status + " status text:" + res.statusText);
-            return;
-          }
-
-          const data = await res.json();
-          setSuggestions(data);
-        }
-        
-      } catch (err) {
-        //console.err("Autocomplete error: ", err);
-        setSuggestions([]);
-      }
-    }, 300);*/
 
     debounceTimer = setTimeout(async() => {
 
@@ -109,13 +93,20 @@ const TripList = () => {
       return;
     }
 
+    if(!coords || !coords.lat || !coords.lon) {
+      alert("Please select a valid location from the suggestions.");  
+      return;
+    }
+
     const tripData = {
-      title: tripTitle,
+      name: tripTitle,
+      category: tripCateg,
       startTime: tripStartTime,
       endTime: tripEndTime,
-      address: location,
+      venue: location,
       coordLat: coords.lat,
       coordLong: coords.lon,
+      notes: tripNote,
     };
 
     addTrip(tripData);
@@ -125,7 +116,10 @@ const TripList = () => {
     setTripEndTime("00:00");
     setLocation("");
     setCoords("");
+    setTripCateg("");
+    setTripNote("");
   };
+
 
   return (
     <div className=" text-white min-h-screen p-9">
@@ -138,25 +132,30 @@ const TripList = () => {
 
       <ul className="space-y-4">
         {trips.map((trip) => (
-          <li key={trip.id} className="bg-slate-700 p-4 rounded-md flex justify-center items-center">
+          <li key={trip._id} className="bg-slate-700 p-4 rounded-md flex justify-center items-center">
             <div className="flex-1">
-              <div className="text-xl font-semibold">{trip.title}</div>
+              <div className="text-xl font-semibold">{trip.name}</div>
               <div className="text-sm text-gray-400">
-                {trip.address}
+                {trip.venue}
                 <br />
                 {trip.startTime} - {trip.endTime}
               </div>
+              <div className="text-sm text-gray-400">
+                {trip.notes}
+              </div>
+
             </div>
             <button
               className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-200"
-              onClick={() => deleteTrip(trip.id)}
+              onClick={() => deleteTrip(userDate, trip._id)}
             >
               Delete
             </button>
             <button
               className=" text-white px-4 py-2 rounded-md transition duration-200"
             >
-              <PinIcon className="hover:fill-white"/>
+              {<CircleCheck className="white"/>}
+              {/*pinEve && <CircleCheck className="fill-white" onClick={setPinEve(false)}/>*/}
             </button>
           </li>
         ))}
@@ -164,6 +163,7 @@ const TripList = () => {
 
       <h2 className="text-2xl font-semibold mt-8 mb-4">Add an Event</h2>
       <form className="space-y-4" onSubmit={addTripSubmit}>
+
         <div className="space-y-2">
           <label className="text-lg">Title:</label>
           <input
@@ -174,6 +174,18 @@ const TripList = () => {
             className="w-full p-2 rounded-md bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
+        <div className="space-y-2">
+          <label className="text-lg">Category:</label>
+          <input
+            type="text"
+            value={tripCateg}
+            placeholder="Leisure"
+            onChange={(e) => setTripCateg(e.target.value)}
+            className="w-full p-2 rounded-md bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
         <div className="space-y-2">
           <label className="text-lg">Start Time:</label>
           <input
@@ -183,6 +195,7 @@ const TripList = () => {
             className="w-full p-2 rounded-md bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
         <div className="space-y-2">
           <label className="text-lg">End Time:</label>
           <input
@@ -192,6 +205,18 @@ const TripList = () => {
             className="w-full p-2 rounded-md bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
+        <div className="space-y-2">
+          <label className="text-lg">Notes:</label>
+          <input
+            type="text"
+            value={tripNote}
+            placeholder="Go with Alexis. Meet David and Moira on the way!"
+            onChange={(e) => setTripNote(e.target.value)}
+            className="w-full p-2 rounded-md bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
         <div className="space-y-2">
           <label className="text-lg">Location:</label>
           <input
@@ -215,6 +240,8 @@ const TripList = () => {
             </ul>
           )}
         </div>
+
+
         <button
           className="w-full py-3 mt-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200"
           type="submit"

@@ -14,6 +14,7 @@ const UserPage = () => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   useEffect(() => {
+
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     if(!userName || !userid) {
       setSidebarOpen(false);
@@ -113,6 +114,7 @@ const UserPage = () => {
   };
 
   return (
+
     <div className="min-h-screen bg-slate-950 flex">
       {/* Sidebar */}
       {<div
@@ -311,17 +313,22 @@ const UserPage = () => {
                       </div>*/}
                     </div>
                     <div className="py-2">
-                      <button className="w-full text-left px-4 py-2 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors duration-200">
+                      {userName && <button className="w-full text-left px-4 py-2 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors duration-200">
                         Profile Settings
-                      </button>
-                      <button className="w-full text-left px-4 py-2 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors duration-200">
+                      </button>}
+                      {userName && <button className="w-full text-left px-4 py-2 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors duration-200">
                         Help & Support
-                      </button>
-                      <div className="border-t border-slate-700 mt-2 pt-2">
+                      </button>}
+                      {userName && <div className="border-t border-slate-700 mt-2 pt-2">
                         <button className="w-full text-left px-4 py-2 text-red-400 hover:bg-slate-700 hover:text-red-300 transition-colors duration-200">
                           Sign Out
                         </button>
-                      </div>
+                      </div>}
+            
+                      <button className="w-full text-left px-4 py-2 text-red-400 hover:bg-slate-700 hover:text-red-300 transition-colors duration-200" >
+                         Log In
+                      </button>
+                      
                     </div>
                   </div>
                 )}

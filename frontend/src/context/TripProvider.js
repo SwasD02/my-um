@@ -1,52 +1,83 @@
+
 import TripContext from "./TripContext";
-import {useState, useEffect} from 'react';
+import UserProfContext from "./UserProfContext";
+import {useState, useEffect, useContext} from 'react';
 
 const TripProvider = ({children}) => {
     const [trips, setTrips] = useState([]);
-    const [dataArray, setDataArray] = useState([]);
+
+    const {userid, userDate} = useContext(UserProfContext);
 
     useEffect(() => {
 
-        const listTrip = [
-          {
-            id: "0",
-            title: "Class: COMP XYZA",
-            address: "University of Manitoba",
-            startTime: "10:00",
-            endTime: "11:30",
-            coordLat: "49.8054",
-            coordLong: "-97.1401",
-          },
-          {
-            id: "1",
-            title: "Go to gym",
-            address: "Planet Fitness, Pembina Highway",
-            startTime: "9:00",
-            endTime: "9:45",
-            coordLat: "49.7977",
-            coordLong: "-97.1482",
-            
-          },
-          {
-            id: "2",
-            title: "Work",
-            address: "Manitoba Legislative Assembly",
-            startTime: "12:00",
-            endTime: "13:00",
-            coordLat: "49.88502",
-            coordLong: "-97.14708",
-          }
-        ];
+      const listTrip = async () => {
+            const url = `api/users/events?userID=${userid}&date=${userDate}`;
 
-        setTrips(listTrip);
-        setDataArray(listTrip);
+            try{
+                
+                const res = await fetch(url, {
+                  credentials : 'include'
+                });
 
-    }, []);
+                if(!res.ok){
+                    const errorData = await res.json();
+                    console.error('Error fetching suggestions:', errorData.error || 'Unknown error');
+                    return;
+                }
 
-    const addTrip = (newTrip) => {
-       const ind = dataArray.length;
-       setTrips((prevTrips) => [...prevTrips, {...newTrip, ind}]);
-       console.log("new trip added ", {...newTrip, ind});
+                const data = await res.json();
+                setTrips(data);
+
+            }catch(err) {
+                console.error("events client-side error:", err);
+                setTrips([]);
+            }
+      };
+      
+        if(userid && userDate){
+            listTrip();
+        }else{
+            setTrips([]);
+        }
+
+    
+    }, [userid, userDate]);
+
+    
+
+    const addTrip = async (newTrip) => {
+       
+       if (userid) {
+         try {
+           const res = await fetch("api/users/events", {
+             method: "POST",
+             headers: {
+               "Content-Type": "application/json",
+             },
+             body: JSON.stringify({ userDate, event: newTrip }),
+             credentials: 'include'
+           });
+
+           if (!res.ok) {
+             const errorData = await res.json();
+             console.error(
+               "Error adding trip:",
+               errorData.error || "Unknown error"
+             );
+             return;
+           }
+
+           const data = await res.json();
+           setTrips((prevTrips) => [...prevTrips, data]);
+         } catch (err) {
+           console.error("Error adding trip:", err);
+         }
+       }else{
+        const ind = trips.length;
+        setTrips((prevTrips) => [...prevTrips, {...newTrip, ind}]);
+        console.log("new trip added ", {...newTrip, ind});
+       }
+       
     }
 
     const updateTrip = (updatedTrip) => {
@@ -55,11 +86,33 @@ const TripProvider = ({children}) => {
         )
     };
 
-    const deleteTrip = (id) => {
-        setTrips(
-            (prevTrips) => 
-                prevTrips.filter((trip) => trip.id !== id)
-        )
+    const deleteTrip = async (date, id) => {
+
+        if (userid) {
+            const res = await fetch(`api/users/events/${id}?date=${date}`, {
+                method: "DELETE",
+                headers: {
+                "Content-Type": "application/json",
+                },
+                credentials: 'include',
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                console.error(
+                    "Error deleting trip:",
+                    errorData.error || "Unknown error"
+                );
+            return;
+          }
+
+          //listTrip(userid, userDate);
+          setTrips((prevTrips) => prevTrips.filter((trip) => trip._id !== id));    //For the UX part 
+          console.log("Trip deleted successfully");
+        }else{
+           setTrips((prevTrips) => prevTrips.filter((trip) => trip.id !== id));
+        }
+        
     };
 
     const contextValue = {
