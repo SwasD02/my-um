@@ -73,9 +73,9 @@ const TripProvider = ({children}) => {
            console.error("Error adding trip:", err);
          }
        }else{
-        const ind = trips.length;
-        setTrips((prevTrips) => [...prevTrips, {...newTrip, ind}]);
-        console.log("new trip added ", {...newTrip, ind});
+        const id = trips.length;
+        setTrips((prevTrips) => [...prevTrips, {...newTrip, id}]);
+        console.log("new trip added ", {...newTrip, id});
        }
        
     }

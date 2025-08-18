@@ -132,7 +132,7 @@ const TripList = () => {
 
       <ul className="space-y-4">
         {trips.map((trip) => (
-          <li key={trip._id} className="bg-slate-700 p-4 rounded-md flex justify-center items-center">
+          <li key={trip._id || trip.id} className="bg-slate-700 p-4 rounded-md flex justify-center items-center">
             <div className="flex-1">
               <div className="text-xl font-semibold">{trip.name}</div>
               <div className="text-sm text-gray-400">
@@ -147,7 +147,7 @@ const TripList = () => {
             </div>
             <button
               className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-200"
-              onClick={() => deleteTrip(userDate, trip._id)}
+              onClick={() => deleteTrip(userDate, trip._id || trip.id)}
             >
               Delete
             </button>

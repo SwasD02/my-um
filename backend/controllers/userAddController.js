@@ -140,7 +140,7 @@ const getAllUserEvents = async (req, res) => {
     const { date } = req.query; //e.g. /get-event?userID=alice&date=Day%201&activityName=Yoga
     if (!date) {
       console.log("date not found");
-      return res.status(400).json({ error: "date found" });
+      return res.status(400).json({ error: "date not found" });
     }
     
     const user = await req.user;    //from jwt verifyAuth

@@ -1,13 +1,14 @@
 import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { useState, useEffect, useContext, useMemo } from "react";
+import { useState, useEffect, useContext, useMemo, useRef } from "react";
 import './RoutePlan.css'
 import TripContext from "../context/TripContext";
 
 import {X, MapPlus} from "lucide-react"
 
 const api_ORS = process.env.REACT_APP_OPEN_ROUTE_API_KEY;
+const api_Stadia = process.env.REACT_APP_STADIAMAP_API_KEY;
 
 function MapResizer() {
   const map = useMap();
@@ -36,6 +37,16 @@ const custIcon = L.divIcon({
   iconAnchor: [10, 20],
   popupAnchor: [0, -40],
 });
+
+const userLocationIcon = L.icon({
+    iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png', // A distinct blue marker
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41], // Size of the icon
+    iconAnchor: [12, 41], // Point of the icon which will correspond to marker's location
+    popupAnchor: [1, -34], // Point from which the popup should open relative to the iconAnchor
+    shadowSize: [41, 41] // Size of the shadow
+});
+
 
 function MapActions() {
   const [mapActTab, setMapActTab] = useState(true);
@@ -142,12 +153,50 @@ const OpenRouteServicePolyline = ({ startCoords, endCoords, api_key, color }) =>
 const RoutePlan = () => {
   const { trips } = useContext(TripContext);
   const [initialPosition, setInitialPosition] = useState(null);
-  const [finalPosition, setFinalPosition] = useState(null);
+  const [userPos, setUserPos] = useState(null);
+  const watchIdRef = useRef(null);
 
   useEffect(() => {
-    setInitialPosition(trips[0] ? [trips[0].coordLat, trips[0].coordLong] : null);
-    setFinalPosition([49.887379, -97.131187]);
-  }, [trips]);
+
+    if(trips[0]){
+      setInitialPosition([trips[0].coordLat, trips[0].coordLong]);
+    }
+
+  }, [trips, userPos]);
+
+  useEffect(() => {
+    if(!navigator.geolocation){
+      console.error("Geolocation not supported by the browser!");
+      return;
+    }
+
+    const handleSuccess = (position) => {
+      const { latitude, longitude } = position.coords;
+      setUserPos([latitude, longitude]); // Update the user's live position
+    };
+
+    const handleError = (error) => {
+      console.error("Error getting user location:", error);
+    };
+
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      handleSuccess,
+      handleError,
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+      }
+    );
+
+    /*return () => {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+        console.log("Geolocation watch stopped.");
+      }
+    };*/
+
+  }, []);
 
   const allTripsPolyline = useMemo(() => {
     if (!initialPosition || trips.length === 0) {
@@ -187,10 +236,9 @@ const RoutePlan = () => {
   }, [trips, initialPosition]);
 
 
-
   return (
     <MapContainer
-      center={initialPosition}
+      center={initialPosition || userPos || [49.887379, -97.131187]}
       zoom={13}
       scrollWheelZoom={true}
       className="w-full min-h-[calc(100vh-150px)] rounded-xl shadow-md"
@@ -198,11 +246,17 @@ const RoutePlan = () => {
 
         <TileLayer
          attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
+        url={`https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key=${api_Stadia}`}
         />
 
+        {userPos && ( // Only render if userPos is available
+            <Marker position={userPos} icon={userLocationIcon}>
+                <Popup>You are here!</Popup>
+            </Marker>
+        )}
 
-      {(initialPosition && finalPosition) && (
+
+      {(initialPosition) && (
         <>
           <Marker position={initialPosition} icon={custIcon}>
             <Popup>Initial Location</Popup>

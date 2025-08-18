@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 // eslint-disable-next-line
-import {Home,BarChart3,MapPin,Calendar,Settings,User,Bell,Search,Menu,X,ChevronRight,Clock,Route,Zap,Target} from 'lucide-react';
+import {Home,BarChart3,MapPin,Calendar,Settings,User,Bell,Menu,X,ChevronRight,Clock,Route,Zap,Target} from 'lucide-react';
 import RoutePlan from '../components/RoutePlan';
 import TripList from '../components/TripList';
 import UserProfContext from '../context/UserProfContext';
@@ -10,7 +10,7 @@ const UserPage = () => {
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('workspace');
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -25,12 +25,12 @@ const UserPage = () => {
 
   const sidebarTabs = [
     {
-      id: 'dashboard',
-      name: 'Dashboard',
+      id: 'workspace',
+      name: 'Workspace',
       icon: Home,
-      path: '/dashboard',
+      path: '/workspace',
       color: '#F59E0B',
-      description: 'Overview & insights',
+      description: 'Map your day!',
       body: ''
     },
     {
@@ -252,20 +252,6 @@ const UserPage = () => {
               </div>
             </div>
 
-            {/* Center - Search (when sidebar is collapsed) */}
-            {/*{!sidebarOpen && (
-              <div className="flex-1 max-w-md mx-8">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-10 pr-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 transition-colors duration-200"
-                  />
-                </div>
-              </div>
-            )}
-            */}
 
             {/* Right side - Time, Date, and User */}
             <div className="flex items-center space-x-6">
@@ -299,39 +285,9 @@ const UserPage = () => {
                     <div className="text-white font-medium group-hover:text-orange-400 transition-colors duration-200">
                       {userName? userName : "Hi guest!"}
                     </div>
-                    {/*<div className="text-xs text-slate-400">Premium User</div>*/}
                   </div>
                 </button>
 
-                {/* User Dropdown */}
-                {userMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-64 bg-slate-800 border border-slate-700 rounded-xl shadow-xl py-2 z-50">
-                    <div className="px-4 py-3 border-b border-slate-700">
-                      <div className="text-white font-medium">{userName}</div>
-                      {/*<div className="text-sm text-slate-400">
-                        john.doe@example.com
-                      </div>*/}
-                    </div>
-                    <div className="py-2">
-                      {userName && <button className="w-full text-left px-4 py-2 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors duration-200">
-                        Profile Settings
-                      </button>}
-                      {userName && <button className="w-full text-left px-4 py-2 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors duration-200">
-                        Help & Support
-                      </button>}
-                      {userName && <div className="border-t border-slate-700 mt-2 pt-2">
-                        <button className="w-full text-left px-4 py-2 text-red-400 hover:bg-slate-700 hover:text-red-300 transition-colors duration-200">
-                          Sign Out
-                        </button>
-                      </div>}
-            
-                      <button className="w-full text-left px-4 py-2 text-red-400 hover:bg-slate-700 hover:text-red-300 transition-colors duration-200" >
-                         Log In
-                      </button>
-                      
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -350,22 +306,21 @@ const UserPage = () => {
                 <p className="text-slate-400">
                   {sidebarTabs.find((tab) => tab.id === activeTab)?.description}
                 </p>
-                {activeTab === "routes" && <RoutePlan/>}
+                {activeTab === "workspace" && 
+                  <div>
+                  <RoutePlan/>
+                  <TripList/>
+                  </div>
+                }
               </div>
             </div>
 
-                <TripList/>
+                
           </div>
         </main>}
       </div>
 
-      {/* Click outside handler for user menu */}
-      {userMenuOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setUserMenuOpen(false)}
-        />
-      )}
+      
     </div>
   );
 };
