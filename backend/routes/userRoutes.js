@@ -5,12 +5,16 @@ const {
   createNewEvent,
   getAllUserEvents,
   getUserEvent,
+  getTotalUserEvents,
   delEvent,
   delUser
 } = require('../controllers/userAddController');
 
-//GET all user events
+//GET all user events for a particular date
 router.get('/events', getAllUserEvents);
+
+//GET total user events
+router.get('/events/all', getTotalUserEvents);
 
 //GET a particular user event
 router.get('/events/:id', getUserEvent);

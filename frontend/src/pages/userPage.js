@@ -4,6 +4,7 @@ import {Home,BarChart3,MapPin,Calendar,Settings,User,Bell,Menu,X,ChevronRight,Cl
 import RoutePlan from '../components/RoutePlan';
 import TripList from '../components/TripList';
 import UserProfContext from '../context/UserProfContext';
+import Schedule from '../components/Schedule';
 
 const UserPage = () => {
   const { userName, userid } = useContext(UserProfContext);
@@ -310,6 +311,11 @@ const UserPage = () => {
                   <div>
                   <RoutePlan/>
                   <TripList/>
+                  </div>
+                }
+                {activeTab === 'schedule' && 
+                  <div>
+                    <Schedule/>
                   </div>
                 }
               </div>

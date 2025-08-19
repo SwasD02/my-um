@@ -164,6 +164,24 @@ const getAllUserEvents = async (req, res) => {
   }
 };
 
+//GET all events for the user
+const getTotalUserEvents = async (req, res) => {
+  try { 
+
+    const user = await req.user;    //from jwt verifyAuth
+    if (!user) return res.status(400).json({ error: "USER not found" });
+
+    if (user.days.length === 0) {
+      return res.status(200).json([]);
+    }
+    return res.status(200).json(user.days);
+
+  }catch(err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  } 
+};
+
 //GET a particular event of the day of the user
 const getUserEvent = async (req, res) => {
   try {
@@ -255,6 +273,7 @@ module.exports = {
   logoutUser,
   createNewEvent,
   getAllUserEvents,
+  getTotalUserEvents,
   getUserEvent,
   delEvent,
   delUser
