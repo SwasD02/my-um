@@ -5,6 +5,7 @@ import RoutePlan from '../components/RoutePlan';
 import TripList from '../components/TripList';
 import UserProfContext from '../context/UserProfContext';
 import Schedule from '../components/Schedule';
+import Locations from '../components/Locations';
 
 const UserPage = () => {
   const { userName, userid } = useContext(UserProfContext);
@@ -318,6 +319,10 @@ const UserPage = () => {
                     <Schedule/>
                   </div>
                 }
+                {
+                  activeTab === 'locations' && <div><Locations/></div>
+                }
+
               </div>
             </div>
 
