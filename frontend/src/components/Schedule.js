@@ -1,5 +1,3 @@
-
-
 import {useState, useEffect} from 'react';
 
 const Schedule = () => {
@@ -57,16 +55,16 @@ const Schedule = () => {
                 <ul className="space-y-4">
                     {userEvents.map((day) => (
                         <li key={day._id || day.date} className="bg-slate-900 p-4 rounded-md mb-6">
-                            <h2 className="text-2xl font-semibold mb-2">{day.date}</h2>
+                            <h2 className=" text-2xl font-semibold mb-2">{day.date}</h2>
                             {day.events && day.events.length > 0 ? (
                                 <ul className="space-y-3">
                                     {day.events.map((activity) => (
-                                        <li key={activity._id || activity.name + activity.startTime} className="bg-slate-800 p-3 rounded-md">
-                                            <div className="text-xl font-semibold">{activity.name}</div>
-                                            <div className="text-sm text-gray-300">
+                                        <li key={activity._id || activity.name + activity.startTime} className="bg-slate-950 p-3 rounded-md">
+                                            <div className="text-xl font-semibold text-sky-200">{activity.name}</div>
+                                            <div className="text-sm text-sky-400">
                                                 {activity.venue}
                                             </div>
-                                            <div className="text-sm text-gray-300">
+                                            <div className="text-sm text-sky-400">
                                                 {activity.startTime} - {activity.endTime}
                                             </div>
                                             {activity.notes && <p className="text-sm italic text-gray-400 mt-1">{activity.notes}</p>}

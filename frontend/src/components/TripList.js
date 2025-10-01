@@ -26,7 +26,7 @@ const TripList = () => {
 
   useEffect(() => {
     updateUserDate(formatDate(currentTime));
-  }, []);
+  });
 
   const handleLocation = async (e) => {
     clearTimeout(debounceTimer);
@@ -243,8 +243,9 @@ const TripList = () => {
 
 
         <button
-          className="w-full py-3 mt-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200"
+          className="w-full py-3 mt-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200 disabled:bg-gray-600 disabled:cursor-not-allowed"
           type="submit"
+          disabled={!location || !tripTitle || !tripCateg || !tripStartTime || !tripEndTime || !coords}
         >
           Add
         </button>

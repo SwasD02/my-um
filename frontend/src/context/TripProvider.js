@@ -6,7 +6,7 @@ import {useState, useEffect, useContext} from 'react';
 const TripProvider = ({children}) => {
     const [trips, setTrips] = useState([]);
 
-    const {userid, userDate} = useContext(UserProfContext);
+    const {userid, userDate, updateUserDate} = useContext(UserProfContext);
 
     useEffect(() => {
 
@@ -22,6 +22,7 @@ const TripProvider = ({children}) => {
                 if(!res.ok){
                     const errorData = await res.json();
                     console.error('Error fetching suggestions:', errorData.error || 'Unknown error');
+                    setTrips([]);
                     return;
                 }
 
@@ -41,7 +42,7 @@ const TripProvider = ({children}) => {
         }
 
     
-    }, [userid, userDate]);
+    }, [userid, userDate, updateUserDate]);
 
     
 

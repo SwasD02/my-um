@@ -34,6 +34,10 @@ const eventsSchema = new Schema({
     notes: {
         type: String, 
         required: false
+    },
+    completed: {
+        type: Boolean,
+        default: false
     }
 })
 

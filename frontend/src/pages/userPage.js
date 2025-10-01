@@ -6,9 +6,10 @@ import TripList from '../components/TripList';
 import UserProfContext from '../context/UserProfContext';
 import Schedule from '../components/Schedule';
 import Locations from '../components/Locations';
+import Routes from '../components/Routes';
 
 const UserPage = () => {
-  const { userName, userid } = useContext(UserProfContext);
+  const { userName, userid, updateUserDate } = useContext(UserProfContext);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -310,6 +311,7 @@ const UserPage = () => {
                 </p>
                 {activeTab === "workspace" && 
                   <div>
+                    {updateUserDate(formatDate(currentTime))}
                   <RoutePlan/>
                   <TripList/>
                   </div>
@@ -321,6 +323,9 @@ const UserPage = () => {
                 }
                 {
                   activeTab === 'locations' && <div><Locations/></div>
+                }
+                {
+                  activeTab === 'routes' && <div><Routes/></div>
                 }
 
               </div>

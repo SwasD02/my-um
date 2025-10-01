@@ -26,7 +26,8 @@ const UserProfProvider = ({children}) => {
 
     const updateUserDate = (newUserDate) => {
         if(newUserDate){
-            setUserDate(newUserDate);       
+            setUserDate(newUserDate);    
+            console.log('New date updated to', newUserDate);   
         }
         else{   
             console.log('no userDate');
