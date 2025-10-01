@@ -45,7 +45,7 @@ const UserPage = () => {
       description: 'Plan your journeys',
       body: ''
     },
-    {
+    /*{
       id: 'analytics',
       name: 'Analytics',
       icon: BarChart3,
@@ -53,7 +53,7 @@ const UserPage = () => {
       color: '#6FC965',
       description: 'Performance metrics',
       body: ''
-    },
+    },*/
     {
       id: 'locations',
       name: 'Locations',
@@ -72,7 +72,7 @@ const UserPage = () => {
       description: 'Time management',
       body: ''
     },
-    {
+    /*{
       id: 'optimize',
       name: 'Optimize',
       icon: Zap,
@@ -89,7 +89,7 @@ const UserPage = () => {
       color: '#10B981',
       description: 'Track progress',
       body: ''
-    }
+    }*/
   ];
 
   const handleTabClick = (tab) => {

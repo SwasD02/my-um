@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Home,
   GraduationCap,
+  // eslint-disable-next-line
   Briefcase,
   Coffee,
   Car,
@@ -35,7 +36,7 @@ const RouteScrollbar = () => {
       backgroundColor: "#E31E31",
       icon: GraduationCap,
     },
-    {
+    /*{
       id: 3,
       title: "See It In Action",
       subtitle: "Interactive Demo",
@@ -43,7 +44,7 @@ const RouteScrollbar = () => {
         "Watch as your daily activities come to life on an interactive map. Each location is color-coded, timed, and connected with smooth route animations that make planning feel like a game.",
       backgroundColor: "#6FC965",
       icon: Briefcase,
-    },
+    },*/
     {
       id: 4,
       title: "Coming Soon",
