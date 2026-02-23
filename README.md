@@ -27,7 +27,7 @@ This is an interactive MERN-based web application designed to help users visuali
 Clone the project
 
 ```bash
-  git clone https://link-to-project
+  git clone https://github.com/SwasD02/routeine
 ```
 
 Go to the backend project directory
